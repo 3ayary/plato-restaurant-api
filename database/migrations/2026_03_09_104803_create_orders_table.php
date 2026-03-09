@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('address');
             $table->string('phone');
-            $table->text('notes');
+            $table->text('notes')->nullable();
             $table->decimal('total_price',8,2);
             $table->string('status');
-            $table->foreignId('user_id')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
