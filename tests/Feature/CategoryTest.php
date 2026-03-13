@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -15,8 +16,9 @@ describe('category', function () {
     });
 
     test('create category', function () {
+        $admin = User::factory()->create(['role' => 'admin']);
 
-        $response = $this->postJson('/api/categories',
+        $response = $this->actingAs($admin)->postJson('/api/categories',
             [
                 'name' => 'test',
             ]);
@@ -28,21 +30,24 @@ describe('category', function () {
 
     test('update category', function () {
 
+        $admin = User::factory()->create(['role' => 'admin']);
+
         $category = Category::create(['name' => 'test']);
-        $response = $this->putJson("/api/categories/{$category->id}",['name'=>'updated Test']);
+        $response = $this->actingAs($admin)->putJson("/api/categories/{$category->id}", ['name' => 'updated Test']);
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['message','data']);
+        $response->assertJsonStructure(['message', 'data']);
     });
 
+    test('delete category', function () {
 
-    test('delete category',function(){
+        $admin = User::factory()->create(['role' => 'admin']);
 
-    $category = Category::create(['name'=>'test']);
-        $response = $this->deleteJson("/api/categories/{$category->id}");
+        $category = Category::create(['name' => 'test']);
+        $response = $this->actingAs($admin)->deleteJson("/api/categories/{$category->id}");
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['message','data']);
+        $response->assertJsonStructure(['message', 'data']);
 
     });
 

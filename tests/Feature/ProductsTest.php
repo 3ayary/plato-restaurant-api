@@ -2,12 +2,12 @@
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 describe('products', function () {
-
 
     test('get products', function () {
         $response = $this->getJson('/api/products');
@@ -20,7 +20,9 @@ describe('products', function () {
 
         $category = Category::create(['name' => 'test']);
 
-        $response = $this->postJson('/api/products', [
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->postJson('/api/products', [
             'name' => 'test',
             'price' => 100,
             'category_id' => $category->id,
@@ -35,6 +37,7 @@ describe('products', function () {
     test('update product', function () {
 
         $category = Category::create(['name' => 'test']);
+        $admin = User::factory()->create(['role' => 'admin']);
 
         $product = Product::create([
             'name' => 'test',
@@ -44,7 +47,7 @@ describe('products', function () {
             'image' => 'test',
         ]);
 
-        $response = $this->putJson("/api/products/{$product->id}", [
+        $response = $this->actingAs($admin)->putJson("/api/products/{$product->id}", [
             'name' => 'test updated',
             'price' => 200,
             'category_id' => $category->id,
@@ -58,6 +61,7 @@ describe('products', function () {
 
     test('delete product', function () {
         $category = Category::create(['name' => 'test']);
+        $admin = User::factory()->create(['role' => 'admin']);
 
         $product = Product::create([
             'name' => 'test',
@@ -67,7 +71,7 @@ describe('products', function () {
             'image' => 'test',
         ]);
 
-        $response = $this->deleteJson("/api/products/{$product->id}");
+        $response = $this->actingAs($admin)->deleteJson("/api/products/{$product->id}");
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['message', 'data']);
