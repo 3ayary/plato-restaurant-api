@@ -1,59 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Plato Restaurant API 🍽️
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful API built with **Laravel** for managing a restaurant system — covering authentication, menu categories, products, and orders. Built as a backend portfolio project with a focus on clean architecture, role-based access control, and full test coverage across all modules.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tech Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **PHP / Laravel**
+- **MySQL**
+- **Laravel Sanctum** (token-based auth)
+- **Eloquent ORM**
+- **Pest** (automated feature testing)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Authentication** — Register, login, and logout using Laravel Sanctum with full Pest test coverage
+- **Categories** — Full CRUD for menu categories with automated tests
+- **Products** — Full CRUD for restaurant products linked to categories, with automated tests
+- **Orders** — Full CRUD for customer orders with automated tests
+- **Admin Control** — Middleware-protected routes for admin-only operations
+- **Relational Data Modeling** — Well-structured Eloquent relationships across all models
+- **Automated Testing** — Pest feature tests covering auth, categories, products, and orders
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## API Endpoints
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Auth
 
-### Premium Partners
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/register` | Register a new user | ❌ |
+| POST | `/api/login` | Login and get token | ❌ |
+| POST | `/api/logout` | Logout and revoke token | ✅ |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Categories
 
-## Contributing
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/categories` | Get all categories | ❌ |
+| POST | `/api/categories` | Create a category | ✅ Admin |
+| GET | `/api/categories/{id}` | Get a single category | ❌ |
+| PUT | `/api/categories/{id}` | Update a category | ✅ Admin |
+| DELETE | `/api/categories/{id}` | Delete a category | ✅ Admin |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Products
 
-## Code of Conduct
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/products` | Get all products | ❌ |
+| POST | `/api/products` | Create a product | ✅ Admin |
+| GET | `/api/products/{id}` | Get a single product | ❌ |
+| PUT | `/api/products/{id}` | Update a product | ✅ Admin |
+| DELETE | `/api/products/{id}` | Delete a product | ✅ Admin |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Orders
 
-## Security Vulnerabilities
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/orders` | Get all orders (admin only) | ✅ Admin |
+| POST | `/api/orders` | Place a new order | ✅ |
+| GET | `/api/orders/{id}` | Get a single order | ✅ |
+| PUT | `/api/orders/{id}` | Update an order | ✅ Admin |
+| DELETE | `/api/orders/{id}` | Delete an order | ✅ Admin |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## Database Structure
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+users
+├── id
+├── name
+├── email
+├── password
+├── is_admin
+└── timestamps
+
+categories
+├── id
+├── name
+└── timestamps
+
+products
+├── id
+├── category_id (FK → categories)
+├── name
+├── description
+├── price
+└── timestamps
+
+orders
+├── id
+├── user_id (FK → users)
+└── timestamps
+
+order_product (pivot)
+├── order_id (FK → orders)
+├── product_id (FK → products)
+└── quantity
+```
+
+---
+
+## Testing
+
+This project uses **Pest** for automated feature testing across all modules.
+
+```bash
+php artisan test
+```
+
+Currently covered:
+- User registration, login, and logout
+- Categories CRUD
+- Products CRUD
+- Orders CRUD
+
+---
+
+## Getting Started
+
+```bash
+# Clone the repo
+git clone https://github.com/3ayary/plato-restaurant-api
+cd plato-restaurant-api
+
+# Install dependencies
+composer install
+
+# Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# Configure your DB in .env then run:
+php artisan migrate --seed
+
+# Start the server
+php artisan serve
+```
+
+---
+
+## What I Learned Building This
+
+This project pushed me to think about how a real-world restaurant backend is structured end-to-end — from modeling the relationships between users, products, categories, and orders, to protecting routes with role-based middleware, to making sure every module is backed by automated tests. Writing Pest tests for each resource reinforced the habit of building with confidence rather than just hoping things work.
