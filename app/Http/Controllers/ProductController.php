@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -9,11 +10,9 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::all();
+        $products = Product::with('category')->get();
 
-        return response()->json([
-            'data' => $products,
-        ], 200);
+        return ProductResource::collection($products);
 
     }
 
@@ -43,10 +42,7 @@ class ProductController extends Controller
             'image' => $imageUrl,
         ]);
 
-        return response()->json([
-            'message' => 'created successfuly',
-            'data' => $product,
-        ], 201);
+        return new ProductResource($product);
 
     }
 
@@ -79,10 +75,7 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        return response()->json([
-            'message' => 'updated successfuly',
-            'data' => $product,
-        ], 200);
+        return (new ProductResource($product))->response()->setStatusCode(200);
 
     }
 
@@ -92,9 +85,6 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return response()->json([
-            'message' => 'deleted successfuly',
-            'data' => $product,
-        ], 200);
+        return (new ProductResource($product))->response()->setStatusCode(200);
     }
 }

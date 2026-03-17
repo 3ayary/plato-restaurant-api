@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -47,29 +48,25 @@ class OrderController extends Controller
 
         $order->update(['total_price' => $totalPrice]);
 
-        return response()->json([
-            'message' => 'created successfuly',
-            'data' => $order,
-        ], 201);
+        $order->load(['user', 'items.product']);
+
+        return new OrderResource($order);
+
     }
 
     public function index(Request $request)
     {
 
-        $orders = Order::where('user_id', $request->user()->id)->get();
+        $orders = Order::with(['user', 'items.product'])->where('user_id', $request->user()->id)->get();
 
-        return response()->json([
-            'data' => $orders,
-        ], 200);
+        return OrderResource::collection($orders);
     }
 
     public function show(Request $request, $orderId)
     {
-        $order = Order::with('items')->where('id', $orderId)->where('user_id', $request->user()->id)->firstOrFail();
+        $order = Order::with(['user', 'items.product'])->where('id', $orderId)->where('user_id', $request->user()->id)->firstOrFail();
 
-        return response()->json([
-            'data' => $order,
-        ], 200);
+        return new OrderResource($order);
     }
 
     public function statusUpdate(Request $request, $orderId)
@@ -82,6 +79,6 @@ class OrderController extends Controller
 
         $order->update(['status' => $request->status]);
 
-        return response()->json(['data' => $order]);
+        return new OrderResource($order);
     }
 }

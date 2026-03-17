@@ -43,7 +43,7 @@ describe('products', function () {
         ]);
 
         $response->assertStatus(201);
-        $response->assertJsonStructure(['message', 'data']);
+        $response->assertJsonStructure(['data']);
     });
 
     test('update product', function () {
@@ -68,7 +68,7 @@ describe('products', function () {
         ]);
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['message', 'data']);
+        $response->assertJsonStructure(['data']);
     });
 
     test('delete product', function () {
@@ -86,7 +86,7 @@ describe('products', function () {
         $response = $this->actingAs($admin)->deleteJson("/api/products/{$product->id}");
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['message', 'data']);
+        $response->assertJsonStructure(['data']);
     });
 
 });
