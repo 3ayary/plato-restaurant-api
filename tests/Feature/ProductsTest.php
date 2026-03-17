@@ -4,6 +4,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 
 uses(RefreshDatabase::class);
 
@@ -18,6 +19,17 @@ describe('products', function () {
 
     test('create product', function () {
 
+        $mockResult = Mockery::mock();
+        $mockResult->shouldReceive('offsetGet')->with('secure_url')->andReturn('https://fake.com/image.jpg');
+
+        $mockApi = Mockery::mock();
+        $mockApi->shouldReceive('upload')->andReturn($mockResult);
+
+        $mockCloudinary = Mockery::mock();
+        $mockCloudinary->shouldReceive('uploadApi')->andReturn($mockApi);
+
+        $this->app->instance('cloudinary', $mockCloudinary);
+
         $category = Category::create(['name' => 'test']);
 
         $admin = User::factory()->create(['role' => 'admin']);
@@ -27,7 +39,7 @@ describe('products', function () {
             'price' => 100,
             'category_id' => $category->id,
             'description' => 'test',
-            'image' => 'test',
+            'image' => UploadedFile::fake()->image('product.jpg'),
         ]);
 
         $response->assertStatus(201);
@@ -44,7 +56,7 @@ describe('products', function () {
             'price' => 100,
             'category_id' => $category->id,
             'description' => 'test',
-            'image' => 'test',
+            'image' => 'https://fake.com/old-image.jpg',
         ]);
 
         $response = $this->actingAs($admin)->putJson("/api/products/{$product->id}", [
@@ -52,7 +64,7 @@ describe('products', function () {
             'price' => 200,
             'category_id' => $category->id,
             'description' => 'test updated',
-            'image' => 'test updated',
+            'image' => UploadedFile::fake()->image('product.jpg'),
         ]);
 
         $response->assertStatus(200);
@@ -68,7 +80,7 @@ describe('products', function () {
             'price' => 100,
             'category_id' => $category->id,
             'description' => 'test',
-            'image' => 'test',
+            'image' => UploadedFile::fake()->image('product.jpg'),
         ]);
 
         $response = $this->actingAs($admin)->deleteJson("/api/products/{$product->id}");

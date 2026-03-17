@@ -19,16 +19,29 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-
         $validated = $request->validate([
             'name' => 'required|min:2',
             'price' => 'required|numeric',
             'description' => 'nullable',
-            'image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        $product = Product::create($validated);
+        $imageUrl = null;
+
+        if ($request->hasFile('image')) {
+            $uploadedFile = Cloudinary()->uploadApi()->upload($request->file('image')->getRealPath());
+
+            $imageUrl = $uploadedFile->offsetGet('secure_url');
+        }
+
+        $product = Product::create([
+            'name' => $validated['name'],
+            'price' => $validated['price'],
+            'description' => $validated['description'] ?? null,
+            'category_id' => $validated['category_id'],
+            'image' => $imageUrl,
+        ]);
 
         return response()->json([
             'message' => 'created successfuly',
@@ -42,17 +55,29 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'name' => 'sometimes|min:2',
             'price' => 'sometimes|numeric',
             'description' => 'sometimes|nullable',
-            'image' => 'sometimes|nullable|string',
+            'image' => 'sometimes|nullable|image',
             'category_id' => 'sometimes|exists:categories,id',
         ]);
 
-        $product->update($request->only([
-            'name', 'price', 'description', 'image', 'category_id',
-        ]));
+
+        if ($request->hasFile('image')) {
+
+            if ($product->image) {
+                $publicId = pathinfo(parse_url($product->image, PHP_URL_PATH), PATHINFO_FILENAME);
+
+                Cloudinary()->uploadApi()->destroy($publicId);
+            }
+
+            $uploadedFile = Cloudinary()->uploadApi()->upload($request->file('image')->getRealPath());
+
+            $data['image'] = $uploadedFile->offsetGet('secure_url');
+        }
+
+        $product->update($data);
 
         return response()->json([
             'message' => 'updated successfuly',

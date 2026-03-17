@@ -16,7 +16,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::post('/categories', [CategoryController::class, 'createCategory']);
-    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::any('/categories/{id}', [CategoryController::class, 'update']);
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
     Route::post('/products', [ProductController::class, 'store']);
