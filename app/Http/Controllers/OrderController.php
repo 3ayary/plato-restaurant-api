@@ -57,7 +57,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
 
-        $orders = Order::with(['user', 'items.product'])->where('user_id', $request->user()->id)->get();
+        $orders = Order::with(['user', 'items.product'])->where('user_id', $request->user()->id)->paginate(5);
 
         return OrderResource::collection($orders);
     }

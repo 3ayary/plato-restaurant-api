@@ -24,7 +24,7 @@ describe('category', function () {
             ]);
 
         $response->assertStatus(201);
-        $response->assertJsonStructure(['message', 'data']);
+        $response->assertJsonStructure(['data']);
 
     });
 
@@ -36,7 +36,7 @@ describe('category', function () {
         $response = $this->actingAs($admin)->putJson("/api/categories/{$category->id}", ['name' => 'updated Test']);
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['message', 'data']);
+        $response->assertJsonStructure(['data']);
     });
 
     test('delete category', function () {
@@ -47,7 +47,7 @@ describe('category', function () {
         $response = $this->actingAs($admin)->deleteJson("/api/categories/{$category->id}");
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['message', 'data']);
+        $response->assertJsonStructure(['data']);
 
     });
 
