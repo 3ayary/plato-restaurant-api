@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->paginate(5);
+        $products = Product::with('category')
+        ->when($request->search,function ($query) use ($request){
+            $query->where('name','like', '%' .$request->search . '%' );
+        })
+        ->when($request->category_id, function ($query) use ($request) {
+            $query->where('category_id', $request->category_id );
+        })
+        ->paginate(5);
 
         return ProductResource::collection($products);
 
